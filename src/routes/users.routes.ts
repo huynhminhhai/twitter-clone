@@ -3,6 +3,7 @@ import {
   forgotPasswordController,
   loginController,
   logoutController,
+  meController,
   registerController,
   resendEmailVerifyController,
   resetPasswordController,
@@ -94,5 +95,13 @@ usersRouter.post(
  * Body: {forgot_password_token: string, password: string, confirm_password: string}
  */
 usersRouter.post('/reset-password', resetPasswordValidator, wrapRequestHandler(resetPasswordController))
+
+/**
+ * Desc: Get profile
+ * Path: /me
+ * Method: GET
+ * Headers: { authorization: Bearer <access_token> }
+ */
+usersRouter.get('/me', accessTokenValidator, wrapRequestHandler(meController))
 
 export default usersRouter
