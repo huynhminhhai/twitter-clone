@@ -7,6 +7,7 @@ import databaseService from '~/services/database.services'
 import { hashPassword } from '~/utils/crypto'
 import { signToken } from '~/utils/jwt'
 import dotenv from 'dotenv'
+import { USERS_MESSAGES } from '~/constants/messages'
 
 dotenv.config()
 
@@ -80,6 +81,14 @@ class UsersService {
   async checkEmailExist(email: string) {
     const user = await databaseService.users.findOne({ email })
     return Boolean(user)
+  }
+
+  async logout(refresh_token: string) {
+    await databaseService.refreshTokens.deleteOne({ token: refresh_token })
+
+    return {
+      messgae: USERS_MESSAGES.LOGOUT_SUCCESS
+    }
   }
 }
 
