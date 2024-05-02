@@ -12,6 +12,7 @@ import { USERS_MESSAGES } from '~/constants/messages'
 dotenv.config()
 
 class UsersService {
+  // ACCESS TOKEN
   private signAccessToken(user_id: string) {
     return signToken({
       payload: {
@@ -25,6 +26,7 @@ class UsersService {
     })
   }
 
+  // REFRESH TOKEN
   private signRefreshToken(user_id: string) {
     return signToken({
       payload: {
@@ -38,6 +40,7 @@ class UsersService {
     })
   }
 
+  // EMAIL TOKEN
   private signEmailVerifyToken(user_id: string) {
     return signToken({
       payload: {
@@ -51,6 +54,7 @@ class UsersService {
     })
   }
 
+  // FORGOT PASSWORD TOKEN
   private signForgotPasswordVerifyToken(user_id: string) {
     return signToken({
       payload: {
@@ -64,10 +68,12 @@ class UsersService {
     })
   }
 
+  // CALL PROMISE ACCESS AND REFRESH TOKEN
   private signAccessAndRefreshToken(user_id: string) {
     return Promise.all([this.signAccessToken(user_id), this.signRefreshToken(user_id)])
   }
 
+  // REGISTER
   async register(payload: RegisterRequestBody) {
     const user_id = new ObjectId()
 
@@ -100,6 +106,7 @@ class UsersService {
     }
   }
 
+  // LOGIN
   async login(user_id: string) {
     const [access_token, refresh_token] = await this.signAccessAndRefreshToken(user_id)
 
@@ -116,11 +123,13 @@ class UsersService {
     }
   }
 
+  // CHECK EMAIL EXISTS
   async checkEmailExist(email: string) {
     const user = await databaseService.users.findOne({ email })
     return Boolean(user)
   }
 
+  // LOGOUT
   async logout(refresh_token: string) {
     await databaseService.refreshTokens.deleteOne({ token: refresh_token })
 
@@ -129,6 +138,7 @@ class UsersService {
     }
   }
 
+  // VERIFY EMAIL
   async verifyEmail(user_id: string) {
     const [token] = await Promise.all([
       this.signAccessAndRefreshToken(user_id.toString()),
@@ -157,6 +167,7 @@ class UsersService {
     }
   }
 
+  // RESEND VERIFY EMAIL
   async resendVerifyEmail(user_id: string) {
     const email_verify_token = await this.signEmailVerifyToken(user_id)
 
@@ -181,6 +192,7 @@ class UsersService {
     }
   }
 
+  // FORGOT PASSWORD
   async forgotPassword(user_id: string) {
     const forgot_password_token = await this.signForgotPasswordVerifyToken(user_id)
 
@@ -203,6 +215,28 @@ class UsersService {
 
     return {
       message: USERS_MESSAGES.CHECK_EMAIL_TO_RESET_PASSWORD
+    }
+  }
+
+  // RESET PASSWORD
+  async resetPassword(user_id: string, password: string) {
+    await databaseService.users.updateOne(
+      {
+        _id: new ObjectId(user_id)
+      },
+      {
+        $set: {
+          password: hashPassword(password),
+          forgot_password_token: ''
+        },
+        $currentDate: {
+          updated_at: true
+        }
+      }
+    )
+
+    return {
+      message: USERS_MESSAGES.RESET_PASSWORD_SUCCESS
     }
   }
 }
