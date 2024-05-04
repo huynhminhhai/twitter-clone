@@ -68,3 +68,8 @@ export interface UpdateMeRequestBody {
 export interface GetUserProfileRequestParam {
   username: string
 }
+
+// FOLLOW
+export interface FollowRequestBody {
+  followed_user_id: string
+}
