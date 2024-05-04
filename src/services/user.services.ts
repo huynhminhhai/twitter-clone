@@ -1,6 +1,6 @@
 import { ObjectId } from 'mongodb'
 import { TokenType, UserVerifyStatus } from '~/constants/enums'
-import { RegisterRequestBody } from '~/models/request/User.request'
+import { RegisterRequestBody, UpdateMeRequestBody } from '~/models/request/User.request'
 import RefreshToken from '~/models/schemas/RefreshToken.schema'
 import User from '~/models/schemas/User.schema'
 import databaseService from '~/services/database.services'
@@ -266,6 +266,35 @@ class UsersService {
         _id: new ObjectId(user_id)
       },
       {
+        projection: {
+          password: 0,
+          email_verify_token: 0,
+          forgot_password_token: 0,
+          created_at: 0,
+          updated_at: 0
+        }
+      }
+    )
+
+    return user
+  }
+
+  // UPDATE ME
+  async updateMe(user_id: string, body: UpdateMeRequestBody) {
+    const _body = body.date_of_birth ? { ...body, date_of_birth: new Date(body.date_of_birth) } : body
+
+    const user = await databaseService.users.findOneAndUpdate(
+      { _id: new ObjectId(user_id) },
+      {
+        $set: {
+          ...(_body as UpdateMeRequestBody & { date_of_birth?: Date })
+        },
+        $currentDate: {
+          updated_at: true
+        }
+      },
+      {
+        returnDocument: 'after',
         projection: {
           password: 0,
           email_verify_token: 0,
