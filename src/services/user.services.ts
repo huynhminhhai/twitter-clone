@@ -8,6 +8,8 @@ import { hashPassword } from '~/utils/crypto'
 import { signToken } from '~/utils/jwt'
 import dotenv from 'dotenv'
 import { USERS_MESSAGES } from '~/constants/messages'
+import { ErrorWithStatus } from '~/models/Errors'
+import HTTP_STATUS from '~/constants/httpStatus'
 
 dotenv.config()
 
@@ -90,6 +92,7 @@ class UsersService {
       new User({
         ...payload,
         _id: user_id,
+        username: `user${user_id.toString()}`,
         email_verify_token,
         date_of_birth: new Date(payload.date_of_birth),
         password: hashPassword(payload.password)
@@ -271,7 +274,8 @@ class UsersService {
           email_verify_token: 0,
           forgot_password_token: 0,
           created_at: 0,
-          updated_at: 0
+          updated_at: 0,
+          verify: 0
         }
       }
     )
@@ -304,6 +308,32 @@ class UsersService {
         }
       }
     )
+
+    return user
+  }
+
+  // GET USER PROFILE
+  async getUserProfile(username: string) {
+    const user = await databaseService.users.findOne(
+      { username },
+      {
+        projection: {
+          password: 0,
+          email_verify_token: 0,
+          forgot_password_token: 0,
+          created_at: 0,
+          updated_at: 0,
+          verify: 0
+        }
+      }
+    )
+
+    if (user === null) {
+      throw new ErrorWithStatus({
+        message: USERS_MESSAGES.USER_NOT_FOUND,
+        status: HTTP_STATUS.NOT_FOUND
+      })
+    }
 
     return user
   }
