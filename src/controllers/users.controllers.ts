@@ -22,7 +22,9 @@ import { USERS_MESSAGES } from '~/constants/messages'
 import databaseService from '~/services/database.services'
 import HTTP_STATUS from '~/constants/httpStatus'
 import { UserVerifyStatus } from '~/constants/enums'
-import { pick } from 'lodash'
+import dotenv from 'dotenv'
+
+dotenv.config()
 
 // LOGIN
 export const loginController = async (req: Request<ParamsDictionary, any, LoginRequestBody>, res: Response) => {
@@ -38,6 +40,17 @@ export const loginController = async (req: Request<ParamsDictionary, any, LoginR
     message: USERS_MESSAGES.LOGIN_SUCCESS,
     result
   })
+}
+
+// OAUTH LOGIN
+export const oauthLoginController = async (req: Request, res: Response) => {
+  const { code } = req.query
+
+  const result = await usersService.oauth(code as string)
+
+  const uriRedirectClient = `${process.env.GOOGLE_REDIRECT_CLIENT}?access_token=${result.access_token}&refresh_token=${result.refresh_token}&new_user=${result.newUser}&verify=${result.verify}`
+
+  return res.redirect(uriRedirectClient)
 }
 
 // REGISTER

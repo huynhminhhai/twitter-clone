@@ -11,6 +11,7 @@ import { USERS_MESSAGES } from '~/constants/messages'
 import { ErrorWithStatus } from '~/models/Errors'
 import HTTP_STATUS from '~/constants/httpStatus'
 import Follower from '~/models/schemas/Follower.schema'
+import axios from 'axios'
 
 dotenv.config()
 
@@ -137,6 +138,107 @@ class UsersService {
     return {
       access_token,
       refresh_token
+    }
+  }
+
+  // GET OAUTH GOOGLE TOKEN
+  private async getOauthGoogleToken(code: string) {
+    const body = {
+      code,
+      client_id: process.env.GOOGLE_CLIENT_ID,
+      client_secret: process.env.GOOGLE_REDIRECT_SECRET,
+      redirect_uri: process.env.GOOGLE_REDIRECT_URI,
+      grant_type: 'authorization_code',
+      access_type: 'offline'
+    }
+
+    const { data } = await axios.post('https://oauth2.googleapis.com/token', body, {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      }
+    })
+
+    return data as {
+      access_token: string
+      id_token: string
+    }
+  }
+
+  // GET OAUTH GOOGLE INFOR USER
+  private async getGoogleUserInfor(access_token: string, id_token: string) {
+    const { data } = await axios.get('https://www.googleapis.com/oauth2/v1/userinfo?alt=json', {
+      params: {
+        access_token
+      },
+      headers: {
+        Authorization: `Bearer ${id_token}`
+      }
+    })
+
+    return data as {
+      id: string
+      email: string
+      verified_email: boolean
+      name: string
+      given_name: string
+      family_name: string
+      picture: string
+      locale: string
+    }
+  }
+
+  // OAUTH LOGIN
+  async oauth(code: string) {
+    const { access_token, id_token } = await this.getOauthGoogleToken(code)
+
+    const userInfor = await this.getGoogleUserInfor(access_token, id_token)
+
+    if (!userInfor.verified_email) {
+      throw new ErrorWithStatus({
+        message: USERS_MESSAGES.GMAIL_NOT_VERIFIED,
+        status: HTTP_STATUS.BAD_REQUEST
+      })
+    }
+
+    const user = await databaseService.users.findOne({
+      email: userInfor.email
+    })
+
+    if (user) {
+      const [access_token, refresh_token] = await this.signAccessAndRefreshToken({
+        user_id: user._id.toString(),
+        verify: user.verify
+      })
+
+      await databaseService.refreshTokens.insertOne(
+        new RefreshToken({
+          user_id: user._id,
+          token: refresh_token
+        })
+      )
+
+      return {
+        access_token,
+        refresh_token,
+        newUser: 0,
+        verify: user.verify
+      }
+    } else {
+      const password = Math.random().toString(36).slice(2) + Math.random().toString(36).toUpperCase().slice(2)
+
+      const data = await this.register({
+        name: userInfor.name,
+        email: userInfor.email,
+        date_of_birth: new Date().toISOString(),
+        password,
+        confirm_password: password
+      })
+
+      return {
+        ...data,
+        newUser: 1,
+        verify: UserVerifyStatus.Verified
+      }
     }
   }
 
