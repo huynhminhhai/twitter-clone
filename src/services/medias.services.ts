@@ -19,8 +19,8 @@ class MediasService {
     fs.unlinkSync(file.filepath) // Remove file in temp
 
     return isProduction
-      ? `${process.env.HOST}/medias/${newName}.jpg`
-      : `http://localhost:${process.env.PORT}/medias/${newName}.jpg`
+      ? `${process.env.HOST}/statics/image/${newName}.jpg`
+      : `http://localhost:${process.env.PORT}/statics/image/${newName}.jpg`
   }
 }
 
