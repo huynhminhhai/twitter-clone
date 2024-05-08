@@ -1,7 +1,6 @@
 import { Request } from 'express'
 import formidable, { File } from 'formidable'
 import fs from 'fs'
-import path from 'path'
 import { UPLOAD_DIR_TEMP } from '~/constants/dir'
 
 export const initFolder = () => {
@@ -14,12 +13,13 @@ export const initFolder = () => {
   }
 }
 
-export const handleUploadSingleImage = async (req: Request) => {
+export const handleUploadImage = async (req: Request) => {
   const form = formidable({
     uploadDir: UPLOAD_DIR_TEMP,
-    maxFields: 1,
+    maxFields: 4,
     keepExtensions: true,
-    maxFileSize: 30 * 1024, // 300KB
+    maxFileSize: 500 * 1024, // 500KB
+    maxTotalFileSize: 500 * 1024 * 4,
     filter: function ({ name, originalFilename, mimetype }) {
       const valid = name === 'image' && Boolean(mimetype?.includes('image/'))
 
@@ -31,7 +31,7 @@ export const handleUploadSingleImage = async (req: Request) => {
     }
   })
 
-  return new Promise<File>((resolve, reject) => {
+  return new Promise<File[]>((resolve, reject) => {
     form.parse(req, (err, fields, files) => {
       if (err) {
         return reject(err)
@@ -40,7 +40,7 @@ export const handleUploadSingleImage = async (req: Request) => {
       if (!Boolean(files.image)) {
         return reject(new Error('File is empty'))
       }
-      resolve((files.image as File[])[0])
+      resolve(files.image as File[])
     })
   })
 }
