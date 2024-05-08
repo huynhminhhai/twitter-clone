@@ -1,10 +1,11 @@
 import { Request } from 'express'
-import formidable from 'formidable'
+import formidable, { File } from 'formidable'
 import fs from 'fs'
 import path from 'path'
+import { UPLOAD_DIR_TEMP } from '~/constants/dir'
 
 export const initFolder = () => {
-  const uploadFolderPath = path.resolve('uploads')
+  const uploadFolderPath = UPLOAD_DIR_TEMP
 
   if (!fs.existsSync(uploadFolderPath)) {
     fs.mkdirSync(uploadFolderPath, {
@@ -15,7 +16,7 @@ export const initFolder = () => {
 
 export const handleUploadSingleImage = async (req: Request) => {
   const form = formidable({
-    uploadDir: path.resolve('uploads'),
+    uploadDir: UPLOAD_DIR_TEMP,
     maxFields: 1,
     keepExtensions: true,
     maxFileSize: 30 * 1024, // 300KB
@@ -30,21 +31,22 @@ export const handleUploadSingleImage = async (req: Request) => {
     }
   })
 
-  return new Promise((resolve, reject) => {
+  return new Promise<File>((resolve, reject) => {
     form.parse(req, (err, fields, files) => {
-      console.log('fields: ', fields)
-      console.log('files: ', files)
-
       if (err) {
         return reject(err)
       }
-
       // eslint-disable-next-line no-extra-boolean-cast
-      if (!Boolean(files.name)) {
+      if (!Boolean(files.image)) {
         return reject(new Error('File is empty'))
       }
-
-      resolve(files)
+      resolve((files.image as File[])[0])
     })
   })
+}
+
+export const getNameFromNewFileName = (fullname: string) => {
+  const namearr = fullname.split('.')
+  namearr.pop()
+  return namearr.join('')
 }
