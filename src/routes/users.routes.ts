@@ -8,6 +8,7 @@ import {
   logoutController,
   meController,
   oauthLoginController,
+  refreshTokenController,
   registerController,
   resendEmailVerifyController,
   resetPasswordController,
@@ -200,5 +201,14 @@ usersRouter.put(
   changePasswordValidator,
   wrapRequestHandler(changePasswordController)
 )
+
+/**
+ * Desc: Refresh token
+ * Path: /refresh-token
+ * Method: POST
+ * Headers: { authorization: Bearer <access_token> }
+ * Body: {refresh_token: string}
+ */
+usersRouter.post('/refresh-token', refreshTokenValidator, wrapRequestHandler(refreshTokenController))
 
 export default usersRouter

@@ -351,7 +351,7 @@ export const refreshTokenValidator = validate(
 
             try {
               const [decoded_refresh_token, refresh_token] = await Promise.all([
-                verifyToken({ token: value, secretOrPublicKey: process.env.SECRET_TOKEN_ACCESS as string }),
+                verifyToken({ token: value, secretOrPublicKey: process.env.SECRET_TOKEN_REFRESH as string }),
                 databaseService.refreshTokens.findOne({ token: value })
               ])
 
@@ -366,7 +366,7 @@ export const refreshTokenValidator = validate(
             } catch (error) {
               if (error instanceof JsonWebTokenError) {
                 throw new ErrorWithStatus({
-                  message: USERS_MESSAGES.REFRESH_TOKEN_IS_INVALID,
+                  message: capitalize((error as JsonWebTokenError).message),
                   status: HTTP_STATUS.UNAUTHORIZED
                 })
               }
