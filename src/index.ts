@@ -6,6 +6,7 @@ import mediaRouter from '~/routes/medias.routes'
 import { initFolder } from '~/constants/file'
 import dotenv from 'dotenv'
 import staticsRouter from '~/routes/statics.routes'
+import { UPLOAD_DIR_VIDEO } from '~/constants/dir'
 
 dotenv.config()
 
@@ -17,7 +18,7 @@ const port = process.env.PORT || 4000
 initFolder()
 
 app.use(express.json())
-// app.use('/medias', express.static(UPLOAD_DIR_IMAGE))
+app.use('/statics/video', express.static(UPLOAD_DIR_VIDEO))
 
 // USER
 app.use('/users', usersRouter)
