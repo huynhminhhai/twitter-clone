@@ -10,7 +10,7 @@ import { UPLOAD_DIR_VIDEO } from '~/constants/dir'
 
 dotenv.config()
 
-databaseService.connect()
+databaseService.connect().then(() => databaseService.indexUser())
 const app = express()
 const port = process.env.PORT || 4000
 
