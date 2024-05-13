@@ -7,6 +7,7 @@ import { initFolder } from '~/constants/file'
 import dotenv from 'dotenv'
 import staticsRouter from '~/routes/statics.routes'
 import { UPLOAD_DIR_VIDEO } from '~/constants/dir'
+import tweetRouter from '~/routes/tweet.routes'
 
 dotenv.config()
 
@@ -26,6 +27,9 @@ app.use('/statics/video', express.static(UPLOAD_DIR_VIDEO))
 
 // USER
 app.use('/users', usersRouter)
+
+// TWEET
+app.use('/tweets', tweetRouter)
 
 // MEDIA
 app.use('/medias', mediaRouter)
