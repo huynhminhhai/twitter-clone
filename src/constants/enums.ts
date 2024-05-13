@@ -21,7 +21,7 @@ export enum TweetAudience {
   TwitterCircle // 1
 }
 
-export enum TweetType {
+export enum TweetTypes {
   Tweet,
   Retweet,
   Comment,

@@ -1,13 +1,12 @@
 import { checkSchema } from 'express-validator'
 import { isEmpty } from 'lodash'
 import { ObjectId } from 'mongodb'
-import { MediaType, TweetAudience, TweetType } from '~/constants/enums'
+import { MediaType, TweetAudience, TweetTypes } from '~/constants/enums'
 import { TWEETS_MESSAGES } from '~/constants/messages'
-import { ErrorWithStatus } from '~/models/Errors'
 import { numberEnumToArray } from '~/utils/others'
 import { validate } from '~/utils/validation'
 
-const tweetTypes = numberEnumToArray(TweetType)
+const tweetTypess = numberEnumToArray(TweetTypes)
 
 const audienceTypes = numberEnumToArray(TweetAudience)
 
@@ -17,7 +16,7 @@ export const createTweetValidator = validate(
   checkSchema({
     type: {
       isIn: {
-        options: [tweetTypes],
+        options: [tweetTypess],
         errorMessage: TWEETS_MESSAGES.INVALID_TYPE
       }
     },
@@ -30,16 +29,19 @@ export const createTweetValidator = validate(
     parent_id: {
       custom: {
         options: (value, { req }) => {
-          const type = req.body.type as TweetType
+          const type = req.body.type as TweetTypes
           // eslint-disable-next-line no-irregular-whitespace
           // Nếu type là retweet, comment, quotetweet thì parent_id phải là tweet_id của tweet cha
-          if ([TweetType.Retweet, TweetType.Comment, TweetType.QuoteTweet].includes(type) && !ObjectId.isValid(value)) {
+          if (
+            [TweetTypes.Retweet, TweetTypes.Comment, TweetTypes.QuoteTweet].includes(type) &&
+            !ObjectId.isValid(value)
+          ) {
             throw new Error(TWEETS_MESSAGES.PARENT_ID_MUST_BE_A_VALID_TWEET_ID)
           }
 
           // eslint-disable-next-line no-irregular-whitespace
           // Nếu type là tweet thì parent_id phải là null
-          if (type === TweetType.Tweet && value !== null) {
+          if (type === TweetTypes.Tweet && value !== null) {
             throw new Error(TWEETS_MESSAGES.PARENT_ID_MUST_BE_NULL)
           }
 
@@ -51,7 +53,7 @@ export const createTweetValidator = validate(
       isString: true,
       custom: {
         options: (value, { req }) => {
-          const type = req.body.type as TweetType
+          const type = req.body.type as TweetTypes
 
           const mentions = req.body.mentions as string[]
 
@@ -59,14 +61,14 @@ export const createTweetValidator = validate(
 
           // eslint-disable-next-line no-irregular-whitespace
           // Nếu type là retweet thì content phải là ''
-          if (type === TweetType.Retweet && value !== '') {
+          if (type === TweetTypes.Retweet && value !== '') {
             throw new Error(TWEETS_MESSAGES.CONTENT_MUST_BE_EMPTY_STRING)
           }
 
           // eslint-disable-next-line no-irregular-whitespace
           // Nếu type là comment, quotetweet, tweet và không có mentions và hashtags thì content phải là string và không được rỗng
           if (
-            [TweetType.Comment, TweetType.QuoteTweet, TweetType.Tweet].includes(type) &&
+            [TweetTypes.Comment, TweetTypes.QuoteTweet, TweetTypes.Tweet].includes(type) &&
             isEmpty(mentions) &&
             isEmpty(hashtags) &&
             typeof value !== 'string' &&
