@@ -633,3 +633,14 @@ export const changePasswordValidator = validate(
     ['body']
   )
 )
+
+// CHECK LOGIN VALIDATOR
+export const isUserLogginedValidator = (middleware: (req: Request, res: Response, next: NextFunction) => void) => {
+  return (req: Request, res: Response, next: NextFunction) => {
+    if (req.headers.authorization) {
+      return middleware(req, res, next)
+    }
+
+    next()
+  }
+}
