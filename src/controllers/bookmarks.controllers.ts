@@ -18,7 +18,7 @@ export const bookmarksController = async (req: Request<ParamsDictionary, any, Bo
   })
 }
 
-export const unBookmarksController = async (req: Request, res: Response) => {
+export const unBookmarksController = async (req: Request<{ tweet_id: string }>, res: Response) => {
   const { user_id } = req.decoded_authorization as TokenPayload
 
   const tweet_id = req.params.tweet_id
