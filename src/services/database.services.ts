@@ -5,6 +5,7 @@ import RefreshToken from '~/models/schemas/RefreshToken.schema'
 import Follower from '~/models/schemas/Follower.schema'
 import Tweet from '~/models/schemas/TweetSchema'
 import HashTag from '~/models/schemas/Hashtags.schema'
+import Bookmark from '~/models/schemas/BookmarkSchema'
 
 dotenv.config()
 
@@ -80,6 +81,10 @@ class DatabaseService {
 
   get hashtags(): Collection<HashTag> {
     return this.db.collection(process.env.DB_HASHTAGS_COLLECTION as string)
+  }
+
+  get bookmarks(): Collection<Bookmark> {
+    return this.db.collection(process.env.DB_BOOKMARKS_COLLECTION as string)
   }
 }
 

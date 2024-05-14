@@ -8,6 +8,7 @@ import dotenv from 'dotenv'
 import staticsRouter from '~/routes/statics.routes'
 import { UPLOAD_DIR_VIDEO } from '~/constants/dir'
 import tweetRouter from '~/routes/tweet.routes'
+import bookmarksRouter from '~/routes/bookmarks.routes'
 
 dotenv.config()
 
@@ -36,6 +37,9 @@ app.use('/medias', mediaRouter)
 
 // STATIC
 app.use('/statics', staticsRouter)
+
+// BOOKMARK
+app.use('/bookmarks', bookmarksRouter)
 
 app.use(defaultErrorHandler)
 
