@@ -22,6 +22,6 @@ export const getDetailTweetController = async (req: Request<{ tweet_id: string }
   const tweet_id = req.params.tweet_id
 
   res.json({
-    message: TWEETS_MESSAGES.CREATE_TWEET_SUCCESS
+    message: TWEETS_MESSAGES.GET_TWEET_DETAIL
   })
 }
