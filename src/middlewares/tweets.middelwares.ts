@@ -151,9 +151,113 @@ export const tweetIdValidator = validate(
               })
             }
 
-            const tweet = await databaseService.tweets.findOne({
-              _id: new ObjectId(value)
-            })
+            const [tweet] = await databaseService.tweets
+              .aggregate<Tweet>([
+                {
+                  $match: {
+                    _id: new ObjectId('6643276c30ddc10fff191a5f')
+                  }
+                },
+                {
+                  $lookup: {
+                    from: 'hashtags',
+                    localField: 'hashtags',
+                    foreignField: '_id',
+                    as: 'hashtags'
+                  }
+                },
+                {
+                  $lookup: {
+                    from: 'users',
+                    localField: 'mentions',
+                    foreignField: '_id',
+                    as: 'mentions'
+                  }
+                },
+                {
+                  $lookup: {
+                    from: 'bookmarks',
+                    localField: '_id',
+                    foreignField: 'tweet_id',
+                    as: 'bookmarks'
+                  }
+                },
+                {
+                  $lookup: {
+                    from: 'likes',
+                    localField: '_id',
+                    foreignField: 'tweet_id',
+                    as: 'likes'
+                  }
+                },
+                {
+                  $lookup: {
+                    from: 'tweets',
+                    localField: '_id',
+                    foreignField: 'parent_id',
+                    as: 'tweet_child'
+                  }
+                },
+                {
+                  $addFields: {
+                    bookmarks: {
+                      $size: '$bookmarks'
+                    },
+                    likes: {
+                      $size: '$likes'
+                    },
+                    mentions: {
+                      $map: {
+                        input: '$mentions',
+                        as: 'mention',
+                        in: {
+                          _id: '$$mention._id',
+                          name: '$$mention.name',
+                          username: '$$mention.username',
+                          email: '$$mention.email'
+                        }
+                      }
+                    },
+                    retweets: {
+                      $size: {
+                        $filter: {
+                          input: '$tweet_child',
+                          as: 'tweet',
+                          cond: {
+                            $eq: ['$$tweet.type', 1]
+                          }
+                        }
+                      }
+                    },
+                    comments: {
+                      $size: {
+                        $filter: {
+                          input: '$tweet_child',
+                          as: 'tweet',
+                          cond: {
+                            $eq: ['$$tweet.type', 2]
+                          }
+                        }
+                      }
+                    },
+                    quotes: {
+                      $size: {
+                        $filter: {
+                          input: '$tweet_child',
+                          as: 'tweet',
+                          cond: {
+                            $eq: ['$$tweet.type', 3]
+                          }
+                        }
+                      }
+                    },
+                    views: {
+                      $add: ['$user_views', '$guest_views']
+                    }
+                  }
+                }
+              ])
+              .toArray()
 
             if (tweet === null) {
               throw new ErrorWithStatus({

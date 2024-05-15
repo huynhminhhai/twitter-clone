@@ -3,7 +3,7 @@ import { ParamsDictionary } from 'express-serve-static-core'
 import { TWEETS_MESSAGES } from '~/constants/messages'
 import { TweetRequestBody } from '~/models/request/Tweet.request'
 import { TokenPayload } from '~/models/request/User.request'
-import tweetService from '~/services/schema.services'
+import tweetService from '~/services/tweets.services'
 
 // CREATE TWEET
 export const createTweetController = async (req: Request<ParamsDictionary, any, TweetRequestBody>, res: Response) => {
@@ -19,9 +19,8 @@ export const createTweetController = async (req: Request<ParamsDictionary, any, 
 
 // GET DETAIL TWEET
 export const getDetailTweetController = async (req: Request<{ tweet_id: string }>, res: Response) => {
-  const tweet_id = req.params.tweet_id
-
   res.json({
-    message: TWEETS_MESSAGES.GET_TWEET_DETAIL
+    message: TWEETS_MESSAGES.GET_TWEET_DETAIL,
+    data: req.tweet
   })
 }
