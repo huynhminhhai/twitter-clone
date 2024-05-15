@@ -1,4 +1,5 @@
 import { ObjectId, WithId } from 'mongodb'
+import { TweetTypes } from '~/constants/enums'
 import { TweetRequestBody } from '~/models/request/Tweet.request'
 import HashTag from '~/models/schemas/Hashtags.schema'
 import Tweet from '~/models/schemas/TweetSchema'
@@ -81,6 +82,131 @@ class TweetService {
     )
 
     return result
+  }
+
+  // GET CHILDREN TWEET
+  async getChildrenTweet(tweet_id: string, tweet_type: TweetTypes, limit: number, page: number) {
+    const tweets = await databaseService.tweets
+      .aggregate<Tweet>([
+        {
+          $match: {
+            parent_id: new ObjectId(tweet_id),
+            type: tweet_type
+          }
+        },
+        {
+          $lookup: {
+            from: 'hashtags',
+            localField: 'hashtags',
+            foreignField: '_id',
+            as: 'hashtags'
+          }
+        },
+        {
+          $lookup: {
+            from: 'users',
+            localField: 'mentions',
+            foreignField: '_id',
+            as: 'mentions'
+          }
+        },
+        {
+          $lookup: {
+            from: 'bookmarks',
+            localField: '_id',
+            foreignField: 'tweet_id',
+            as: 'bookmarks'
+          }
+        },
+        {
+          $lookup: {
+            from: 'likes',
+            localField: '_id',
+            foreignField: 'tweet_id',
+            as: 'likes'
+          }
+        },
+        {
+          $lookup: {
+            from: 'tweets',
+            localField: '_id',
+            foreignField: 'parent_id',
+            as: 'tweet_child'
+          }
+        },
+        {
+          $addFields: {
+            bookmarks: {
+              $size: '$bookmarks'
+            },
+            likes: {
+              $size: '$likes'
+            },
+            mentions: {
+              $map: {
+                input: '$mentions',
+                as: 'mention',
+                in: {
+                  _id: '$$mention._id',
+                  name: '$$mention.name',
+                  username: '$$mention.username',
+                  email: '$$mention.email'
+                }
+              }
+            },
+            retweets: {
+              $size: {
+                $filter: {
+                  input: '$tweet_child',
+                  as: 'tweet',
+                  cond: {
+                    $eq: ['$$tweet.type', TweetTypes.Retweet]
+                  }
+                }
+              }
+            },
+            comments: {
+              $size: {
+                $filter: {
+                  input: '$tweet_child',
+                  as: 'tweet',
+                  cond: {
+                    $eq: ['$$tweet.type', TweetTypes.Comment]
+                  }
+                }
+              }
+            },
+            quotes: {
+              $size: {
+                $filter: {
+                  input: '$tweet_child',
+                  as: 'tweet',
+                  cond: {
+                    $eq: ['$$tweet.type', TweetTypes.QuoteTweet]
+                  }
+                }
+              }
+            },
+            views: {
+              $add: ['$user_views', '$guest_views']
+            }
+          }
+        },
+        {
+          $skip: limit * (page - 1)
+        },
+        {
+          $limit: limit
+        }
+      ])
+      .toArray()
+
+    const total = await databaseService.tweets.countDocuments({
+      parent_id: new ObjectId(tweet_id),
+      type: tweet_type
+    })
+
+    return { tweets, total }
   }
 }
 
