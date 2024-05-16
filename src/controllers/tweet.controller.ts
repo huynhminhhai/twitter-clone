@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
 import { ParamsDictionary } from 'express-serve-static-core'
 import { TWEETS_MESSAGES } from '~/constants/messages'
-import { TweetRequestBody } from '~/models/request/Tweet.request'
+import { PaginationRequestParams, TweetRequestBody } from '~/models/request/Tweet.request'
 import { TokenPayload } from '~/models/request/User.request'
 import tweetService from '~/services/tweets.services'
 
@@ -55,5 +55,24 @@ export const getChildrenTweetController = async (req: Request<{ tweet_id: string
       page,
       totalPage: Math.ceil(result.total / limit)
     }
+  })
+}
+
+// GET NEWFEEd
+export const getNewFeedConroller = async (
+  req: Request<ParamsDictionary, any, PaginationRequestParams>,
+  res: Response
+) => {
+  const limit = Number(req.query.limit)
+
+  const page = Number(req.query.page)
+
+  const { user_id } = req.decoded_authorization as TokenPayload
+
+  const result = await tweetService.getNewFeed(user_id, limit, page)
+
+  res.json({
+    message: 'Get newfeed successfully',
+    data: { ...result, limit, page, totalPage: Math.ceil(result.totalPage / limit) }
   })
 }

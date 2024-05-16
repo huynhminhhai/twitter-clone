@@ -362,3 +362,40 @@ export const getTweetChildrenValidator = validate(
     ['query']
   )
 )
+
+// PAGINATION NEWFEED
+export const paginationValidator = validate(
+  checkSchema(
+    {
+      limit: {
+        isNumeric: true,
+        custom: {
+          options: async (value, { req }) => {
+            const num = Number(value)
+
+            if (num > 100 && num > 1) {
+              throw new Error('Maximum is 100 and minimum is 1')
+            }
+
+            return true
+          }
+        }
+      },
+      page: {
+        isNumeric: true,
+        custom: {
+          options: async (value, { req }) => {
+            const num = Number(value)
+
+            if (num > 1) {
+              throw new Error('Minimum is 1')
+            }
+
+            return true
+          }
+        }
+      }
+    },
+    ['query']
+  )
+)

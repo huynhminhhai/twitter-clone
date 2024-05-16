@@ -2,12 +2,14 @@ import { Router } from 'express'
 import {
   createTweetController,
   getChildrenTweetController,
-  getDetailTweetController
+  getDetailTweetController,
+  getNewFeedConroller
 } from '~/controllers/tweet.controller'
 import {
   audienceValidator,
   createTweetValidator,
   getTweetChildrenValidator,
+  paginationValidator,
   tweetIdValidator
 } from '~/middlewares/tweets.middelwares'
 import { accessTokenValidator, isUserLogginedValidator, verifiedUserValidator } from '~/middlewares/users.middlewares'
@@ -28,6 +30,21 @@ tweetRouter.post(
   verifiedUserValidator,
   createTweetValidator,
   wrapRequestHandler(createTweetController)
+)
+
+/**
+ * Desc: Get newfeed
+ * Path: /
+ * Method: GET
+ * Headers: { Authorization: Bearer <access_token> }
+ * Query: {limit: number, page: number}
+ */
+tweetRouter.get(
+  '/',
+  paginationValidator,
+  accessTokenValidator,
+  verifiedUserValidator,
+  wrapRequestHandler(getNewFeedConroller)
 )
 
 /**
