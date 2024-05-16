@@ -4,7 +4,12 @@ import {
   getChildrenTweetController,
   getDetailTweetController
 } from '~/controllers/tweet.controller'
-import { audienceValidator, createTweetValidator, tweetIdValidator } from '~/middlewares/tweets.middelwares'
+import {
+  audienceValidator,
+  createTweetValidator,
+  getTweetChildrenValidator,
+  tweetIdValidator
+} from '~/middlewares/tweets.middelwares'
 import { accessTokenValidator, isUserLogginedValidator, verifiedUserValidator } from '~/middlewares/users.middlewares'
 import { wrapRequestHandler } from '~/utils/handlers'
 
@@ -50,6 +55,7 @@ tweetRouter.get(
 tweetRouter.get(
   '/:tweet_id/children',
   tweetIdValidator,
+  getTweetChildrenValidator,
   isUserLogginedValidator(accessTokenValidator),
   isUserLogginedValidator(verifiedUserValidator),
   wrapRequestHandler(audienceValidator),

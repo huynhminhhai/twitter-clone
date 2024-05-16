@@ -319,3 +319,46 @@ export const audienceValidator = async (req: Request, res: Response, next: NextF
 
   next()
 }
+
+// GET CHILDREN TWEET
+export const getTweetChildrenValidator = validate(
+  checkSchema(
+    {
+      tweet_type: {
+        isIn: {
+          options: [tweetTypess],
+          errorMessage: TWEETS_MESSAGES.INVALID_TYPE
+        }
+      },
+      limit: {
+        isNumeric: true,
+        custom: {
+          options: async (value, { req }) => {
+            const num = Number(value)
+
+            if (num > 100 && num > 1) {
+              throw new Error('Maximum is 100 and minimum is 1')
+            }
+
+            return true
+          }
+        }
+      },
+      page: {
+        isNumeric: true,
+        custom: {
+          options: async (value, { req }) => {
+            const num = Number(value)
+
+            if (num > 1) {
+              throw new Error('Minimum is 1')
+            }
+
+            return true
+          }
+        }
+      }
+    },
+    ['query']
+  )
+)
