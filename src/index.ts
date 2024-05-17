@@ -10,6 +10,7 @@ import { UPLOAD_DIR_VIDEO } from '~/constants/dir'
 import tweetRouter from '~/routes/tweet.routes'
 import bookmarksRouter from '~/routes/bookmarks.routes'
 import likesRouter from '~/routes/likes.routes'
+import searchRouter from '~/routes/search.routes'
 
 dotenv.config()
 
@@ -17,6 +18,7 @@ databaseService.connect().then(() => {
   databaseService.indexUser()
   databaseService.indexRefreshToken()
   databaseService.indexFollower()
+  databaseService.indexTweet()
 })
 const app = express()
 const port = process.env.PORT || 4000
@@ -44,6 +46,9 @@ app.use('/bookmarks', bookmarksRouter)
 
 //LIKE
 app.use('/likes', likesRouter)
+
+// SEARCH
+app.use('/search', searchRouter)
 
 app.use(defaultErrorHandler)
 

@@ -481,8 +481,6 @@ class TweetService {
         .toArray()
     ])
 
-    console.log(total)
-
     tweets.forEach((tweet) => {
       ;(tweet.updated_at = date), (tweet.updated_at += 1)
     })
