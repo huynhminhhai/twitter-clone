@@ -1,5 +1,5 @@
 import { ObjectId } from 'mongodb'
-import { TweetAudience, TweetTypes } from '~/constants/enums'
+import { MediaType, MediaTypeQuery, TweetAudience, TweetTypes } from '~/constants/enums'
 import { SearchRequestQuery } from '~/models/request/Search.request'
 import databaseService from '~/services/database.services'
 
@@ -9,14 +9,26 @@ class SearchService {
 
     const page = Number(query.page)
 
+    const $filter: any = {}
+
+    if (query.content && query.content.trim() !== '') {
+      $filter.$text = {
+        $search: query.content
+      }
+    }
+
+    if (query.media_type) {
+      if (query.media_type === MediaTypeQuery.Image) {
+        $filter['medias.type'] = MediaType.Image
+      } else if (query.media_type === MediaTypeQuery.Video) {
+        $filter['medias.type'] = MediaType.Video
+      }
+    }
+
     const tweets = await databaseService.tweets
       .aggregate([
         {
-          $match: {
-            $text: {
-              $search: query.content
-            }
-          }
+          $match: $filter
         },
         {
           $lookup: {
@@ -193,11 +205,7 @@ class SearchService {
       databaseService.tweets
         .aggregate([
           {
-            $match: {
-              $text: {
-                $search: query.content
-              }
-            }
+            $match: $filter
           },
           {
             $lookup: {
