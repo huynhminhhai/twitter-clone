@@ -11,6 +11,7 @@ import tweetRouter from '~/routes/tweet.routes'
 import bookmarksRouter from '~/routes/bookmarks.routes'
 import likesRouter from '~/routes/likes.routes'
 import searchRouter from '~/routes/search.routes'
+import cors from 'cors'
 
 dotenv.config()
 
@@ -26,6 +27,7 @@ const port = process.env.PORT || 4000
 // Create uploads folder
 initFolder()
 
+app.use(cors())
 app.use(express.json())
 app.use('/statics/video', express.static(UPLOAD_DIR_VIDEO))
 
