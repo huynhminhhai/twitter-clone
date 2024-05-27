@@ -3,6 +3,7 @@ import { ParamSchema, checkSchema } from 'express-validator'
 import { JsonWebTokenError } from 'jsonwebtoken'
 import { capitalize } from 'lodash'
 import { ObjectId } from 'mongodb'
+import { envConfig } from '~/constants/config'
 import { UserVerifyStatus } from '~/constants/enums'
 import HTTP_STATUS from '~/constants/httpStatus'
 import { USERS_MESSAGES } from '~/constants/messages'
@@ -93,7 +94,7 @@ const forgotPasswordTokenSchema: ParamSchema = {
       try {
         const decoded_forgot_password_token = await verifyToken({
           token: value,
-          secretOrPublicKey: process.env.SECRET_TOKEN_PASSWORD as string
+          secretOrPublicKey: envConfig.passwordKeyToken
         })
 
         const { user_id } = decoded_forgot_password_token as TokenPayload
@@ -310,7 +311,7 @@ export const accessTokenValidator = validate(
             try {
               const decoded_authorization = await verifyToken({
                 token: access_token,
-                secretOrPublicKey: process.env.SECRET_TOKEN_ACCESS as string
+                secretOrPublicKey: envConfig.accessKeyToken
               })
 
               req.decoded_authorization = decoded_authorization
@@ -351,7 +352,7 @@ export const refreshTokenValidator = validate(
 
             try {
               const [decoded_refresh_token, refresh_token] = await Promise.all([
-                verifyToken({ token: value, secretOrPublicKey: process.env.SECRET_TOKEN_REFRESH as string }),
+                verifyToken({ token: value, secretOrPublicKey: envConfig.refreshKeyToken }),
                 databaseService.refreshTokens.findOne({ token: value })
               ])
 
@@ -401,7 +402,7 @@ export const verifyEmailTokenValidator = validate(
             try {
               const decoded_email_verify_token = await verifyToken({
                 token: value,
-                secretOrPublicKey: process.env.SECRET_TOKEN_EMAIL as string
+                secretOrPublicKey: envConfig.emailKeyToken
               })
 
               req.decoded_email_verify_token = decoded_email_verify_token

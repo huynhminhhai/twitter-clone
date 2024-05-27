@@ -6,14 +6,12 @@ import User from '~/models/schemas/User.schema'
 import databaseService from '~/services/database.services'
 import { hashPassword } from '~/utils/crypto'
 import { signToken, verifyToken } from '~/utils/jwt'
-import dotenv from 'dotenv'
 import { USERS_MESSAGES } from '~/constants/messages'
 import { ErrorWithStatus } from '~/models/Errors'
 import HTTP_STATUS from '~/constants/httpStatus'
 import Follower from '~/models/schemas/Follower.schema'
 import axios from 'axios'
-
-dotenv.config()
+import { envConfig } from '~/constants/config'
 
 class UsersService {
   // ACCESS TOKEN
@@ -24,9 +22,9 @@ class UsersService {
         token_type: TokenType.AccessToken,
         verify
       },
-      privateKey: process.env.SECRET_TOKEN_ACCESS as string,
+      privateKey: envConfig.accessKeyToken,
       options: {
-        expiresIn: process.env.ACCESS_TOKEN_EXPIRES_IN
+        expiresIn: envConfig.accessKeyExpired
       }
     })
   }
@@ -41,7 +39,7 @@ class UsersService {
           verify,
           exp
         },
-        privateKey: process.env.SECRET_TOKEN_REFRESH as string
+        privateKey: envConfig.refreshKeyToken
       })
     }
     return signToken({
@@ -50,9 +48,9 @@ class UsersService {
         token_type: TokenType.RefreshToken,
         verify
       },
-      privateKey: process.env.SECRET_TOKEN_REFRESH as string,
+      privateKey: envConfig.refreshKeyToken,
       options: {
-        expiresIn: process.env.REFRESH_TOKEN_EXPIRES_IN
+        expiresIn: envConfig.refreshKeyExpired
       }
     })
   }
@@ -65,9 +63,9 @@ class UsersService {
         token_type: TokenType.EmailVerifyToken,
         verify
       },
-      privateKey: process.env.SECRET_TOKEN_EMAIL as string,
+      privateKey: envConfig.emailKeyToken,
       options: {
-        expiresIn: process.env.EMAIL_VERIFY_TOKEN_EXPIRES_IN
+        expiresIn: envConfig.emailKeyExpired
       }
     })
   }
@@ -80,9 +78,9 @@ class UsersService {
         token_type: TokenType.ForgotPasswordToken,
         verify
       },
-      privateKey: process.env.SECRET_TOKEN_PASSWORD as string,
+      privateKey: envConfig.passwordKeyToken,
       options: {
-        expiresIn: process.env.FORGOT_PASSWORD_TOKEN_EXPIRES_IN
+        expiresIn: envConfig.passwordKeyExpired
       }
     })
   }
@@ -96,7 +94,7 @@ class UsersService {
   private decodedRefreshToken(refresh_token: string) {
     return verifyToken({
       token: refresh_token,
-      secretOrPublicKey: process.env.SECRET_TOKEN_REFRESH as string
+      secretOrPublicKey: envConfig.refreshKeyToken
     })
   }
 
@@ -199,9 +197,9 @@ class UsersService {
   private async getOauthGoogleToken(code: string) {
     const body = {
       code,
-      client_id: process.env.GOOGLE_CLIENT_ID,
-      client_secret: process.env.GOOGLE_REDIRECT_SECRET,
-      redirect_uri: process.env.GOOGLE_REDIRECT_URI,
+      client_id: envConfig.googleClientId,
+      client_secret: envConfig.googleRedirectSecret,
+      redirect_uri: envConfig.googleRedirectUri,
       grant_type: 'authorization_code',
       access_type: 'offline'
     }

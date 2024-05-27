@@ -4,7 +4,6 @@ import databaseService from '~/services/database.services'
 import { defaultErrorHandler } from '~/middlewares/error.middlewares'
 import mediaRouter from '~/routes/medias.routes'
 import { initFolder } from '~/constants/file'
-import dotenv from 'dotenv'
 import staticsRouter from '~/routes/statics.routes'
 import { UPLOAD_DIR_VIDEO } from '~/constants/dir'
 import tweetRouter from '~/routes/tweet.routes'
@@ -12,11 +11,11 @@ import bookmarksRouter from '~/routes/bookmarks.routes'
 import likesRouter from '~/routes/likes.routes'
 import searchRouter from '~/routes/search.routes'
 import cors from 'cors'
-import YAML from 'yaml'
 // import fs from 'fs'
 // import path from 'path'
 import swaggerUi from 'swagger-ui-express'
 import swaggerJSDoc from 'swagger-jsdoc'
+import { envConfig } from '~/constants/config'
 
 // const file = fs.readFileSync(path.resolve('twitter-swagger.yaml'), 'utf-8')
 
@@ -35,8 +34,6 @@ const openapiSpecification = swaggerJSDoc(options)
 
 // const swaggerDocument = YAML.parse(file)
 
-dotenv.config()
-
 databaseService.connect().then(() => {
   databaseService.indexUser()
   databaseService.indexRefreshToken()
@@ -44,7 +41,7 @@ databaseService.connect().then(() => {
   databaseService.indexTweet()
 })
 const app = express()
-const port = process.env.PORT || 4000
+const port = envConfig.port
 
 // Create uploads folder
 initFolder()

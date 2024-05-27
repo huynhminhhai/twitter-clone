@@ -4,7 +4,7 @@ import sharp from 'sharp'
 import { UPLOAD_DIR_IMAGE, UPLOAD_DIR_VIDEO } from '~/constants/dir'
 import path from 'path'
 import fs from 'fs'
-import { isProduction } from '~/constants/config'
+import { envConfig, isProduction } from '~/constants/config'
 import { MediaType } from '~/constants/enums'
 import { Media } from '~/models/Others'
 
@@ -24,8 +24,8 @@ class MediasService {
 
         return {
           url: isProduction
-            ? `${process.env.HOST}/statics/image/${newName}.jpg`
-            : `http://localhost:${process.env.PORT}/statics/image/${newName}.jpg`,
+            ? `${envConfig.host}/statics/image/${newName}.jpg`
+            : `http://localhost:${envConfig.port}/statics/image/${newName}.jpg`,
           type: MediaType.Image
         }
       })
@@ -42,8 +42,8 @@ class MediasService {
     const result: Media[] = files.map((file) => {
       return {
         url: isProduction
-          ? `${process.env.HOST}/statics/video/${newFilename}`
-          : `http://localhost:${process.env.PORT}/statics/video/${newFilename}`,
+          ? `${envConfig.host}/statics/video/${newFilename}`
+          : `http://localhost:${envConfig.port}/statics/video/${newFilename}`,
         type: MediaType.Video
       }
     })

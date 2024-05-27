@@ -5,8 +5,12 @@
   "main": "index.js",
   "scripts": {
     "dev": "npx nodemon --development",
+    "dev:prod": "npx nodemon --env=production",
+    "dev:stag": "npx nodemon --env=staging",
     "build": "rimraf ./dist && tsc && tsc-alias",
-    "start": "node dist/index.js --production",
+    "start:dev": "node dist/index.js --development",
+    "start:prod": "node dist/index.js --production",
+    "start:stag": "node dist/index.js --staging",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "prettier": "prettier --check .",

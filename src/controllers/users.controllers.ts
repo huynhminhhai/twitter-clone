@@ -23,9 +23,7 @@ import { USERS_MESSAGES } from '~/constants/messages'
 import databaseService from '~/services/database.services'
 import HTTP_STATUS from '~/constants/httpStatus'
 import { UserVerifyStatus } from '~/constants/enums'
-import dotenv from 'dotenv'
-
-dotenv.config()
+import { envConfig } from '~/constants/config'
 
 // LOGIN
 export const loginController = async (req: Request<ParamsDictionary, any, LoginRequestBody>, res: Response) => {
@@ -49,7 +47,7 @@ export const oauthLoginController = async (req: Request, res: Response) => {
 
   const result = await usersService.oauth(code as string)
 
-  const uriRedirectClient = `${process.env.GOOGLE_REDIRECT_CLIENT}?access_token=${result.access_token}&refresh_token=${result.refresh_token}&new_user=${result.newUser}&verify=${result.verify}`
+  const uriRedirectClient = `${envConfig.googleRedirectClient}?access_token=${result.access_token}&refresh_token=${result.refresh_token}&new_user=${result.newUser}&verify=${result.verify}`
 
   return res.redirect(uriRedirectClient)
 }
