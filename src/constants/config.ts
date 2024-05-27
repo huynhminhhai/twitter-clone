@@ -1,12 +1,31 @@
-import argv from 'minimist'
 import dotenv from 'dotenv'
+import fs from 'fs'
+import path from 'path'
 
-const option = argv(process.argv.slice(2))
+const env = process.env.NODE_ENV || 'development'
+const envFileName = `.env.${env}`
 
-export const isProduction = option.env === 'production'
+if (!env) {
+  console.log(`You do not provide NODE_ENV (example: development, production,...)`)
+  console.log(`Find out NODE_ENV = ${env}`)
+  process.exit(1)
+}
+
+console.log(`Find out NODE_ENV = ${env}, so app will use env file is ${envFileName}`)
+
+if (!fs.existsSync(path.resolve(envFileName))) {
+  console.log(`Can not find env file ${envFileName}`)
+  console.log(
+    `Warning: App do not use .env file, for example env is development then app will use .env.development file`
+  )
+  console.log(`Pls create ${envFileName} file base on .env.example `)
+  process.exit(1)
+}
+
+export const isProduction = env === 'production'
 
 dotenv.config({
-  path: option.env ? `.env.${option.env}` : '.env'
+  path: envFileName
 })
 
 export const envConfig = {
