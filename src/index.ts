@@ -10,12 +10,13 @@ import tweetRouter from '~/routes/tweet.routes'
 import bookmarksRouter from '~/routes/bookmarks.routes'
 import likesRouter from '~/routes/likes.routes'
 import searchRouter from '~/routes/search.routes'
-import cors from 'cors'
+import cors, { CorsOptions } from 'cors'
+import helmet from 'helmet'
 // import fs from 'fs'
 // import path from 'path'
 import swaggerUi from 'swagger-ui-express'
 import swaggerJSDoc from 'swagger-jsdoc'
-import { envConfig } from '~/constants/config'
+import { envConfig, isProduction } from '~/constants/config'
 
 // const file = fs.readFileSync(path.resolve('twitter-swagger.yaml'), 'utf-8')
 
@@ -46,6 +47,11 @@ const port = envConfig.port
 // Create uploads folder
 initFolder()
 
+app.use(helmet())
+
+const corsOption: CorsOptions = {
+  origin: isProduction ? envConfig.client : '*'
+}
 app.use(cors())
 app.use(express.json())
 app.use('/statics/video', express.static(UPLOAD_DIR_VIDEO))
