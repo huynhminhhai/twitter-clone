@@ -1,8 +1,10 @@
 {
   "watch": [
-    "src"
+    "src",
+    ".env",
+    "swagger"
   ],
-  "ext": ".ts,.js",
+  "ext": ".ts,.js,.yaml,.json",
   "ignore": [],
   "exec": "npx ts-node ./src/index.ts"
 }

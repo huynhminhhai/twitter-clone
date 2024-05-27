@@ -1,0 +1,185 @@
+openapi: 3.0.3
+info:
+  title: API Tiwtter-Clone by Nodejs
+  contact:
+    email: huynhminhhai.1555@gmail.com
+  version: '1.0'
+servers:
+  - url: http://localhost:4000
+tags:
+  - name: users
+paths:
+  /users/login:
+    post:
+      tags:
+        - users
+      summary: Login 
+      description: Login user
+      operationId: login
+      requestBody:
+        description: Login a user in app
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequestBody'
+        required: true
+      responses:
+        '200':
+          description: Success
+  
+  /users/register:
+    post:
+      tags:
+        - users
+      summary: Register 
+      description: Register user
+      operationId: register
+      requestBody:
+        description: Register a user in app
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequestBody'
+        required: true
+      responses:
+        '200':
+          description: Success
+  
+  /users/refresh-token:
+    post:
+      tags:
+        - users
+      summary: Refresh Token 
+      description: Refresh token when refresh_token expired
+      operationId: refresh-token
+      requestBody:
+        description: Refresh Token
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshTokenRequestBody'
+        required: true
+      responses:
+        '200':
+          description: Success
+      security:
+        - BearerAuth: []
+  
+  /users/logout:
+    post:
+      tags:
+        - users
+      summary: Logout
+      description: Logout a user
+      operationId: logout
+      requestBody:
+        description: Logout
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshTokenRequestBody'
+        required: true
+      responses:
+        '200':
+          description: Success
+      security:
+        - BearerAuth: []
+  
+  /users/verify-email:
+    post:
+      tags:
+        - users
+      summary: Verify Email
+      description: Verify user when user click the link in email
+      operationId: verify-email
+      requestBody:
+        description: Verify Email Body
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifyEmailRequestBody'
+        required: true
+      responses:
+        '200':
+          description: Logout successful
+
+  /users/resend-verify-email:
+    post:
+      tags:
+        - users
+      summary: Resend Verify Email
+      description: Resend verify email when verify email expired
+      operationId: resend-verify-email
+      responses:
+        '200':
+          description: Success
+      security:
+        - BearerAuth: []
+
+  /users/forgot-password:
+    post:
+      tags:
+        - users
+      summary: Forgot Password 
+      description: Send email when forgot password
+      operationId: forgot-password
+      requestBody:
+        description: Send email when forgot password
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ForgotPasswordRequestBody'
+        required: true
+      responses:
+        '200':
+          description: Success
+
+  /users/verify-forgot-password:
+    post:
+      tags:
+        - users
+      summary: Verify Forgot Password Token
+      description: verify forgot password token
+      operationId: verify-forgot-password
+      requestBody:
+        description: Verify forgot password token
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifyForgotPasswordTokenRequestBody'
+        required: true
+      responses:
+        '200':
+          description: Success
+
+  /users/reset-password:
+    post:
+      tags:
+        - users
+      summary: Reset Password
+      description: Reset password after verify forgot password token
+      operationId: reset-password
+      requestBody:
+        description: Reset password after verify forgot password token
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResetPasswordRequestBody'
+        required: true
+      responses:
+        '200':
+          description: Success
+
+  /users/me:
+    get:
+      tags:
+        - users
+      summary: My profile 
+      description: Get my profile
+      operationId: getMe
+      responses:
+        '200':
+          description: Success
+      security:
+        - BearerAuth: []
+ 

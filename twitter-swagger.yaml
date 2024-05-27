@@ -1,0 +1,150 @@
+openapi: 3.0.3
+info:
+  title: API Tiwtter-Clone Nodejs
+  contact:
+    email: huynhminhhai.1555@gmail.com
+  version: '1.0'
+servers:
+  - url: http://localhost:4000
+tags:
+  - name: users
+paths:
+  /users/login:
+    post:
+      tags:
+        - users
+      summary: Login 
+      description: Login user
+      operationId: login
+      requestBody:
+        description: Login a user in app
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequestBody'
+        required: true
+      responses:
+        '200':
+          description: Login Successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Login success
+                  data:
+                    $ref: '#components/schemas/AuthenticationSuccess'
+        '422':
+          description: Invalid input
+  /users/me:
+    get:
+      tags:
+        - users
+      summary: My profile 
+      description: Get my profile
+      operationId: getMe
+      responses:
+        default:
+          description: Get my profile successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+      security:
+        - BearerAuth: []
+      
+                  
+components:
+  schemas:
+    LoginRequestBody:
+      type: object
+      properties:
+        email:
+          type: string
+          example: 'hmh1@gmail.com'
+        password:
+          type: string
+          example: 'Hai12345!'
+    AuthenticationSuccess:
+      type: object
+      properties:
+        access_token:
+          type: string
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjYzZGMzOWIzN2VhNjAwNDk4NzIyYTlhIiwidG9rZW5fdHlwZSI6MCwidmVyaWZ5IjoxLCJpYXQiOjE3MTYzNjA3MTUsImV4cCI6MTcxNjM2MTYxNX0.X17KgV2zvreO0zzRWm2fKR5KgHOONSJlbOxzJ9sHD8w"
+        refresh_token:
+          type: string
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjYzZGMzOWIzN2VhNjAwNDk4NzIyYTlhIiwidG9rZW5fdHlwZSI6MCwidmVyaWZ5IjoxLCJpYXQiOjE3MTYzNjA3MTUsImV4cCI6MTcxNjM2MTYxNX0.X17KgV2zvreO0zzRWm2fKR5KgHOONSJlbOxzJ9sHD8w"
+    User:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: User ID
+          example: "663dc39b37ea600498722a9a"
+        name:
+          type: string
+          description: User's name
+          example: "Huynh Minh Hai"
+        email:
+          type: string
+          format: email
+          description: User's email
+          example: "hmh@gmail.com"
+        date_of_birth:
+          type: string
+          format: date-time
+          description: Date of birth in ISO8601 format
+          example: "2011-10-05T14:48:00.000Z"
+        created_at:
+          type: string
+          format: date-time
+          description: Account creation date in ISO8601 format
+          example: "2024-05-10T06:50:03.261Z"
+        updated_at:
+          type: string
+          format: date-time
+          description: Last update date in ISO8601 format
+          example: "2024-05-10T06:51:41.942Z"
+        verify:
+          $ref: '#/components/schemas/UserVerifyStatus'
+        bio:
+          type: string
+          description: User's bio
+          example: ""
+        location:
+          type: string
+          description: User's location
+          example: ""
+        website:
+          type: string
+          description: User's website
+          example: ""
+        username:
+          type: string
+          description: User's username
+          example: "user663dc39b37ea600498722a9a"
+        avatar:
+          type: string
+          description: URL to user's avatar
+          example: ""
+        cover_photo:
+          type: string
+          description: URL to user's cover photo
+          example: ""
+        twitter_circle:
+          type: array
+          items:
+            type: string
+            description: ObjectId of Twitter circle member
+            example: "664311056f4b26eddbc669d8"
+    UserVerifyStatus:
+      type: number
+      enum: [Unverified, Verified, Banned]
+      example: 1
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

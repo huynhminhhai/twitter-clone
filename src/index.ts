@@ -12,6 +12,28 @@ import bookmarksRouter from '~/routes/bookmarks.routes'
 import likesRouter from '~/routes/likes.routes'
 import searchRouter from '~/routes/search.routes'
 import cors from 'cors'
+import YAML from 'yaml'
+// import fs from 'fs'
+// import path from 'path'
+import swaggerUi from 'swagger-ui-express'
+import swaggerJSDoc from 'swagger-jsdoc'
+
+// const file = fs.readFileSync(path.resolve('twitter-swagger.yaml'), 'utf-8')
+
+const options: swaggerJSDoc.Options = {
+  definition: {
+    openapi: '3.0.3',
+    info: {
+      title: 'API Tiwtter-Clone Nodejs',
+      version: '1.0.0'
+    }
+  },
+  apis: ['./swagger/*.yaml'] // files containing annotations as above
+}
+
+const openapiSpecification = swaggerJSDoc(options)
+
+// const swaggerDocument = YAML.parse(file)
 
 dotenv.config()
 
@@ -30,6 +52,7 @@ initFolder()
 app.use(cors())
 app.use(express.json())
 app.use('/statics/video', express.static(UPLOAD_DIR_VIDEO))
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(openapiSpecification))
 
 // USER
 app.use('/users', usersRouter)
